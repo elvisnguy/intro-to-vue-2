@@ -1,66 +1,105 @@
 <template>
-  <div>
+  <v-container>
     <h1>Dashboard</h1>
-    <v-data-table
-      :headers="headers"
-      :items="desserts"
-      :items-per-page="5"
-      class="elevation-1"
-      @click:row="selectRow"
-    ></v-data-table>
-    <v-snackbar v-model="snackbar">
-      You have selected {{ currentItem }}
+
+    <v-row>
+      <v-col v-for="sale in sales" :key="`${sale.title}`" cols="12" md="4">
+        <SalesGraph :sale="sale" />
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col
+        v-for="statistic in statistics"
+        :key="`${statistic.title}`"
+        cols="12"
+        md="6"
+        lg="3"
+      >
+        <StatisticCard :statistic="statistic" />
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col cols="12" md="8">
+        <EmployeesTable :employees="employees" @select-employee="setEmployee" />
+      </v-col>
+      <v-col cols="12" md="4">
+        <EventTimeline :timeline="timeline" />
+      </v-col>
+    </v-row>
+
+    <v-row id="below-the-fold" v-intersect="showMoreContent">
+      <v-col cols="12" md="8">
+        <EmployeesTable :employees="employees" @select-employee="setEmployee" />
+      </v-col>
+      <v-col cols="12" md="4">
+        <EventTimeline :timeline="timeline" />
+      </v-col>
+    </v-row>
+
+    <v-row v-if="loadNewContent" id="more-content">
+      <v-col>
+        <v-skeleton-loader
+          ref="skeleton"
+          type="table"
+          class="mx-auto"
+        ></v-skeleton-loader>
+      </v-col>
+    </v-row>
+
+    <v-snackbar v-model="snackbar" :left="$vuetify.breakpoint.lgAndUp">
+      You have selected {{ selectedEmployee.name }},
+      {{ selectedEmployee.title }}
       <v-btn color="pink" text @click="snackbar = false">
         Close
       </v-btn>
     </v-snackbar>
-  </div>
+  </v-container>
 </template>
+
 <script>
+import EmployeesTable from '../components/EmployeesTable'
+import EventTimeline from '../components/EventTimeline'
+import SalesGraph from '../components/SalesGraph'
+import StatisticCard from '../components/StatisticCard'
+
+import employeesData from '../data/employees.json'
+import timelineData from '../data/timeline.json'
+import salesData from '../data/sales.json'
+import statisticsData from '../data/statistics.json'
+
 export default {
-  name: "DashboardPage",
+  name: 'DashboardPage',
+  components: {
+    EmployeesTable,
+    EventTimeline,
+    SalesGraph,
+    StatisticCard
+  },
   data() {
     return {
-      currentItem: "",
+      employees: employeesData,
+      loadNewContent: false,
+      sales: salesData,
+      selectedEmployee: {
+        name: '',
+        title: ''
+      },
       snackbar: false,
-      headers: [
-        {
-          text: "Dessert (100g serving)",
-          align: "left",
-          sortable: false,
-          value: "name",
-        },
-        { text: "Calories", value: "calories" },
-        { text: "Fat (g)", value: "fat" },
-        { text: "Carbs (g)", value: "carbs" },
-        { text: "Protein (g)", value: "protein" },
-        { text: "Iron (%)", value: "iron" },
-      ],
-      desserts: [
-        {
-          name: "Frozen Yogurt",
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          iron: "1%",
-        },
-        {
-          name: "Ice cream sandwich",
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          iron: "1%",
-        },
-      ],
-    };
+      statistics: statisticsData,
+      timeline: timelineData
+    }
   },
   methods: {
-    selectRow(event) {
-      this.snackbar = true;
-      this.currentItem = event.name;
+    setEmployee(event) {
+      this.snackbar = true
+      this.selectedEmployee.name = event.name
+      this.selectedEmployee.title = event.title
     },
-  },
-};
+    showMoreContent(entries) {
+      this.loadNewContent = entries[0].isIntersecting
+    }
+  }
+}
 </script>

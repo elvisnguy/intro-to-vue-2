@@ -9,12 +9,8 @@
         text
         rounded
         :to="link.url"
+        >{{ link.label }}</v-btn
       >
-        {{ link.label }}
-      </v-btn>
-      <v-btn @click="toggleTheme" text rounded>
-        Toggle Theme
-      </v-btn>
     </v-app-bar>
     <v-content>
       <router-view></router-view>
@@ -39,37 +35,26 @@
     </v-footer>
   </v-app>
 </template>
-
 <script>
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {
       links: [
         {
-          label: 'Home',
-          url: '/'
+          label: "Home",
+          url: "/",
         },
         {
-          label: 'Login',
-          url: '/login'
+          label: "Login",
+          url: "/login",
         },
         {
-          label: 'Signup',
-          url: '/signup'
+          label: "Dashboard",
+          url: "/dashboard",
         },
-        {
-          label: 'Dashboard',
-          url: '/dashboard'
-        }
-      ]
-    }
+      ],
+    };
   },
-  methods: {
-    toggleTheme() {
-      this.$vuetify.theme.themes.dark.anchor = '#41B883'
-      this.$vuetify.theme.dark = !this.$vuetify.theme.dark
-    }
-  }
-}
+};
 </script>
